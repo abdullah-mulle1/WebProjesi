@@ -1,0 +1,35 @@
+﻿@model Berber.Models.Randevu
+
+@{
+    ViewData["Title"] = "Yeni Randevu Ekle";
+}
+
+<h2 class="text-center mt-5">Yeni Randevu Ekle</h2>
+
+<div class="container mt-4">
+    <form asp-action="YeniRandevu" method="post" class="card p-4 shadow-sm">
+        <div class="mb-3">
+            <label class="form-label">Çalışan</label>
+            <select asp-for="ClsnId" asp-items="@(new SelectList(ViewBag.Calisanlar, "Id", "Ad"))" class="form-select">
+                <option value="">-- Çalışan Seçiniz --</option>
+            </select>
+            <span asp-validation-for="ClsnId" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Hizmet</label>
+            <select asp-for="HzmtrId" asp-items="@(new SelectList(ViewBag.Hizmetler, "Id", "Ad"))" class="form-select">
+                <option value="">-- Hizmet Seçiniz --</option>
+            </select>
+            <span asp-validation-for="HzmtrId" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="RndvSt" class="form-label">Tarih ve Saat</label>
+            <input asp-for="RndvSt" type="datetime-local" class="form-control" />
+            <span asp-validation-for="RndvSt" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-success">Kaydet</button>
+    </form>
+</div>
