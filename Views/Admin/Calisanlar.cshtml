@@ -1,14 +1,19 @@
 ﻿@model IEnumerable<Berber.Models.Calisan>
 
-<h2>Çalışanlar Yönetimi</h2>
-<a asp-action="YeniCalisan" class="btn btn-primary">Yeni Çalışan Ekle</a>
+    @{
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    }
 
-<table class="table">
+<h2>Çalışanlar</h2>
+<a href="@Url.Action("CalisanEkle", "Admin")" class="btn btn-primary">Yeni Çalışan Ekle</a>
+
+<table class="table table-striped mt-3">
     <thead>
         <tr>
             <th>Ad</th>
-            <th>Uzmanlık</th>
-            <th>Müsaitlik</th>
+            <th>Başlangıç Saati</th>
+            <th>Bitiş Saati</th>
+            <th>Hizmetler</th>
             <th>İşlemler</th>
         </tr>
     </thead>
@@ -17,11 +22,26 @@
         {
             <tr>
                 <td>@calisan.Ad</td>
-                <td>@calisan.Uzmnlk</td>
-                <td>@calisan.Mst</td>
+                <td>@calisan.SaatBaslangic</td>
+                <td>@calisan.SaatBitis</td>
                 <td>
-                    <a asp-action="DuzenleCalisan" asp-route-id="@calisan.Id" class="btn btn-warning">Düzenle</a>
-                    <a asp-action="SilCalisan" asp-route-id="@calisan.Id" class="btn btn-danger">Sil</a>
+                    @if (calisan.Hizmetler != null && calisan.Hizmetler.Any())
+                    {
+                        <ul>
+                            @foreach (var calisanHizmet in calisan.Hizmetler)
+                            {
+                                <li>@calisanHizmet.hizmet.Ad</li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <span>Bu çalışana atanmış hizmet yok.</span>
+                    }
+                </td>
+                <td>
+                    <a href="@Url.Action("CalisanGuncelle", "Admin", new { id = calisan.CalisanId })" class="btn btn-warning">Güncelle</a>
+                    <a href="@Url.Action("CalisanSil", "Admin", new { id = calisan.CalisanId })" class="btn btn-danger" onclick="return confirm('Çalışanı silmek istediğinize emin misiniz?');">Sil</a>
                 </td>
             </tr>
         }

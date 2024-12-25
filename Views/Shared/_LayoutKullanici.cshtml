@@ -1,0 +1,28 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Kullanıcı</title>
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a asp-controller="Hesap" asp-action="GirisYap">Giriş Yap</a></li>
+                <li><a asp-controller="Hesap" asp-action="KayitOl">Kayıt Ol</a></li>
+                <li><a asp-controller="Hesap" asp-action="CikisYap">Çıkış Yap</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <div class="container">
+            @RenderBody()
+        </div>
+    </main>
+    <footer>
+        <p>&copy; 2024 - Berber - Kullanıcı Layout</p>
+    </footer>
+</body>
+</html>

@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Berber.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Berber.Controllers
 {
-
+    [Authorize(Roles ="Admin")]
     public class AdminController : Controller
     {
         private readonly BerberContext _context;
@@ -13,145 +14,193 @@ namespace Berber.Controllers
         {
             _context = context;
         }
+
         public IActionResult Index ()
         {
-
             return View();
         }
-        // 1. قائمة الموظفين (Read)
-        public async Task<IActionResult> Calisanlar()
+        public IActionResult Calisanlar()
         {
-            var calisanlar = await _context.Clsnlr.ToListAsync();
+            var calisanlar = _context.Calisanlar
+                .Include(c => c.Hizmetler) // Load the CalisanHizmet relationship
+                .ThenInclude(ch => ch.hizmet) // Load the Hizmet details
+                .ToList();
+
             return View(calisanlar);
         }
 
-        // 2. إضافة موظف جديد (Create)
-        [HttpGet]
-        public IActionResult YeniCalisan()
+        // Çalışan Ekleme (GET)
+        public IActionResult CalisanEkle()
         {
-            return View();
+            var hizmetler = _context.Hizmetler.ToList();
+            ViewBag.Hizmetler = hizmetler; // Pass hizmetler to the view
+            return View(new Calisan());
         }
 
+
+        // Çalışan Ekleme (POST)
         [HttpPost]
-        public async Task<IActionResult> YeniCalisan(Calisan calisan)
+        [ValidateAntiForgeryToken]
+        public IActionResult CalisanEkle(Calisan calisan, int[] selectedHizmetler)
         {
             if (ModelState.IsValid)
             {
-                _context.Clsnlr.Add(calisan);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Calisanlar));
+                // Add new employee
+                _context.Calisanlar.Add(calisan);
+                _context.SaveChanges();
+
+                // Add selected hizmetler to the CalisanHizmet table
+                foreach (var hizmetId in selectedHizmetler)
+                {
+                    _context.CalisanHizmetler.Add(new CalisanHizmet
+                    {
+                        CalisanId = calisan.CalisanId,
+                        HizmetId = hizmetId
+                    });
+                }
+
+                _context.SaveChanges();
+                return RedirectToAction("Calisanlar");
             }
+
+            // Re-fetch hizmetler in case of validation error
+            ViewBag.Hizmetler = _context.Hizmetler.ToList();
             return View(calisan);
         }
 
-        // 3. تعديل موظف (Update)
-        [HttpGet]
-        public async Task<IActionResult> DuzenleCalisan(int id)
+
+        public IActionResult CalisanGuncelle(int id)
         {
-            var calisan = await _context.Clsnlr.FindAsync(id);
-            if (calisan == null) return NotFound();
+            var calisan = _context.Calisanlar
+                .Include(c => c.Hizmetler)
+                .ThenInclude(ch => ch.hizmet)
+                .FirstOrDefault(c => c.CalisanId == id);
+
+            if (calisan == null)
+            {
+                return NotFound();
+            }
+
+            ViewBag.Hizmetler = _context.Hizmetler.ToList(); // Pass all hizmetler to the view
             return View(calisan);
         }
 
+        // Çalışan Güncelleme (POST)
         [HttpPost]
-        public async Task<IActionResult> DuzenleCalisan(Calisan calisan)
+        [ValidateAntiForgeryToken]
+        public IActionResult CalisanGuncelle(Calisan calisan, int[] SelectedHizmetler)
         {
             if (ModelState.IsValid)
             {
-                _context.Clsnlr.Update(calisan);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Calisanlar));
+                // Update employee details
+                var existingCalisan = _context.Calisanlar
+                    .Include(c => c.Hizmetler)
+                    .FirstOrDefault(c => c.CalisanId == calisan.CalisanId);
+
+                if (existingCalisan == null)
+                {
+                    return NotFound();
+                }
+
+                existingCalisan.Ad = calisan.Ad;
+                existingCalisan.SaatBaslangic = calisan.SaatBaslangic;
+                existingCalisan.SaatBitis = calisan.SaatBitis;
+
+                // Update Hizmetler
+                existingCalisan.Hizmetler.Clear(); // Remove existing relationships
+                foreach (var hizmetId in SelectedHizmetler)
+                {
+                    existingCalisan.Hizmetler.Add(new CalisanHizmet
+                    {
+                        CalisanId = calisan.CalisanId,
+                        HizmetId = hizmetId
+                    });
+                }
+
+                _context.SaveChanges();
+                return RedirectToAction("Calisanlar");
             }
+
+            ViewBag.Hizmetler = _context.Hizmetler.ToList(); // Reload hizmetler in case of validation error
             return View(calisan);
         }
 
-        // 4. حذف موظف (Delete)
-        [HttpGet]
-        public async Task<IActionResult> SilCalisan(int id)
-        {
-            var calisan = await _context.Clsnlr.FindAsync(id);
-            if (calisan == null) return NotFound();
-            return View(calisan);
-        }
 
-        [HttpPost, ActionName("SilCalisan")]
-        public async Task<IActionResult> SilCalisanOnay(int id)
+        // Çalışan Silme
+        public IActionResult CalisanSil(int id)
         {
-            var calisan = await _context.Clsnlr.FindAsync(id);
+            var calisan = _context.Calisanlar.Find(id);
             if (calisan != null)
             {
-                _context.Clsnlr.Remove(calisan);
-                await _context.SaveChangesAsync();
+                _context.Calisanlar.Remove(calisan);
+                _context.SaveChanges();
             }
-            return RedirectToAction(nameof(Calisanlar));
+            return RedirectToAction("Calisanlar");
         }
 
-        // 5. قائمة الخدمات (Read)
-        public async Task<IActionResult> Hizmetler()
+        // Hizmetler CRUD İşlemleri
+        // Listeleme
+        public IActionResult Hizmetler()
         {
-            var hizmetler = await _context.Hzmtrlr.ToListAsync();
+            var hizmetler = _context.Hizmetler.ToList();
             return View(hizmetler);
         }
 
-        // 6. إضافة خدمة جديدة (Create)
-        [HttpGet]
-        public IActionResult YeniHizmet()
+        // Hizmet Ekleme (GET)
+        public IActionResult HizmetEkle()
         {
             return View();
         }
 
+        // Hizmet Ekleme (POST)
         [HttpPost]
-        public async Task<IActionResult> YeniHizmet(Hizmet hizmet)
+        [ValidateAntiForgeryToken]
+        public IActionResult HizmetEkle(Hizmet hizmet)
         {
             if (ModelState.IsValid)
             {
-                _context.Hzmtrlr.Add(hizmet);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Hizmetler));
+                _context.Hizmetler.Add(hizmet);
+                _context.SaveChanges();
+                return RedirectToAction("Hizmetler");
             }
             return View(hizmet);
         }
 
-        // 7. تعديل خدمة (Update)
-        [HttpGet]
-        public async Task<IActionResult> DuzenleHizmet(int id)
+        // Hizmet Güncelleme (GET)
+        public IActionResult HizmetGuncelle(int id)
         {
-            var hizmet = await _context.Hzmtrlr.FindAsync(id);
-            if (hizmet == null) return NotFound();
-            return View(hizmet);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> DuzenleHizmet(Hizmet hizmet)
-        {
-            if (ModelState.IsValid)
+            var hizmet = _context.Hizmetler.Find(id);
+            if (hizmet == null)
             {
-                _context.Hzmtrlr.Update(hizmet);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Hizmetler));
+                return NotFound();
             }
             return View(hizmet);
         }
 
-        // 8. حذف خدمة (Delete)
-        [HttpGet]
-        public async Task<IActionResult> SilHizmet(int id)
+        // Hizmet Güncelleme (POST)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult HizmetGuncelle(Hizmet hizmet)
         {
-            var hizmet = await _context.Hzmtrlr.FindAsync(id);
-            if (hizmet == null) return NotFound();
+            if (ModelState.IsValid)
+            {
+                _context.Hizmetler.Update(hizmet);
+                _context.SaveChanges();
+                return RedirectToAction("Hizmetler");
+            }
             return View(hizmet);
         }
 
-        [HttpPost, ActionName("SilHizmet")]
-        public async Task<IActionResult> SilHizmetOnay(int id)
+        // Hizmet Silme
+        public IActionResult HizmetSil(int id)
         {
-            var hizmet = await _context.Hzmtrlr.FindAsync(id);
+            var hizmet = _context.Hizmetler.Find(id);
             if (hizmet != null)
             {
-                _context.Hzmtrlr.Remove(hizmet);
-                await _context.SaveChangesAsync();
+                _context.Hizmetler.Remove(hizmet);
+                _context.SaveChanges();
             }
-            return RedirectToAction(nameof(Hizmetler));
+            return RedirectToAction("Hizmetler");
         }
     }
 }

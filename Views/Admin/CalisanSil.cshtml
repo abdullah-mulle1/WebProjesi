@@ -1,0 +1,22 @@
+﻿@model Berber.Models.Calisan
+
+@{
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+
+}
+
+<h2>Çalışan Sil</h2>
+
+<p>Bu çalışanı silmek istediğinize emin misiniz?</p>
+
+<div>
+    <h4>@Model.Ad</h4>
+    <p><strong>Başlangıç Saati:</strong> @Model.SaatBaslangic</p>
+    <p><strong>Bitiş Saati:</strong> @Model.SaatBitis</p>
+</div>
+
+<form asp-action="CalisanSil" method="post">
+    <input type="hidden" asp-for="CalisanId" />
+    <button type="submit" class="btn btn-danger">Sil</button>
+    <a asp-action="Calisanlar" class="btn btn-secondary">İptal</a>
+</form>

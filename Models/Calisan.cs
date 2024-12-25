@@ -4,11 +4,17 @@ namespace Berber.Models
 {
     public class Calisan
     {
-        public int Id { get; set; }
+        public int CalisanId { get; set; }
+
         [Required]
-        public string Ad { get; set; } // Adı
+        public string Ad { get; set; } // اسم الموظف
+
         [Required]
-        public string Uzmnlk { get; set; } // Uzmanlık Alanı
-        public bool Mst { get; set; } // Müsaitlik
+        public TimeSpan SaatBaslangic { get; set; } // وقت البداية
+
+        [Required]
+        public TimeSpan SaatBitis { get; set; } // وقت النهاية
+
+        public ICollection<CalisanHizmet> Hizmetler { get; set; } = new List<CalisanHizmet>();
     }
 }

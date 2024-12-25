@@ -1,0 +1,22 @@
+﻿@model Berber.Models.Hizmet
+
+@{
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+
+}
+
+<h2>Hizmet Sil</h2>
+
+<p>Bu hizmeti silmek istediğinize emin misiniz?</p>
+
+<div>
+    <h4>@Model.Ad</h4>
+    <p><strong>Ücret:</strong> @Model.Ucrt</p>
+    <p><strong>Süre (Dakika):</strong> @Model.SrDk</p>
+</div>
+
+<form asp-action="HizmetSil" method="post">
+    <input type="hidden" asp-for="HizmetId" />
+    <button type="submit" class="btn btn-danger">Sil</button>
+    <a asp-action="Hizmetler" class="btn btn-secondary">İptal</a>
+</form>
