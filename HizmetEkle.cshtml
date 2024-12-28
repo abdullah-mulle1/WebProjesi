@@ -1,0 +1,36 @@
+﻿@model Berber.Models.Hizmet
+
+@{
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="card shadow-sm rounded">
+        <div class="card-header bg-primary text-white text-center">
+            <h2 class="m-0"><i class="bi bi-plus-circle-fill"></i> Yeni Hizmet Ekle</h2>
+        </div>
+        <div class="card-body">
+            <form asp-action="HizmetEkle" method="post">
+                <div class="mb-3">
+                    <label class="form-label fw-bold"><i class="bi bi-tag-fill"></i> Ad</label>
+                    <input asp-for="Ad" class="form-control rounded-pill" placeholder="Hizmet adını giriniz..." />
+                    <span asp-validation-for="Ad" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold"><i class="bi bi-currency-exchange"></i> Ücret</label>
+                    <input asp-for="Ucrt" class="form-control rounded-pill" type="number" step="0.01" placeholder="Hizmet ücretini giriniz..." />
+                    <span asp-validation-for="Ucrt" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold"><i class="bi bi-clock-fill"></i> Süre (Dakika)</label>
+                    <input asp-for="SrDk" class="form-control rounded-pill" type="number" placeholder="Hizmet süresini dakika olarak giriniz..." />
+                    <span asp-validation-for="SrDk" class="text-danger"></span>
+                </div>
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-success rounded-pill px-4"><i class="bi bi-save"></i> Kaydet</button>
+                    <a asp-action="Hizmetler" class="btn btn-secondary rounded-pill px-4"><i class="bi bi-arrow-left"></i> İptal</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

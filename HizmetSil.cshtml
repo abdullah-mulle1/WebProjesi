@@ -1,0 +1,36 @@
+﻿@model Berber.Models.Hizmet
+
+@{
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-danger"><i class="bi bi-trash-fill"></i> Hizmet Sil</h2>
+        <a href="@Url.Action("Hizmetler", "Admin")" class="btn btn-secondary rounded-pill px-4 shadow-sm">
+            <i class="bi bi-arrow-left-circle"></i> Geri Dön
+        </a>
+    </div>
+
+    <div class="alert alert-warning shadow-sm">
+        <p class="mb-0"><i class="bi bi-exclamation-triangle-fill text-warning"></i> Bu hizmeti silmek istediğinize emin misiniz?</p>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h4 class="text-primary">@Model.Ad</h4>
+            <p><strong>Ücret:</strong> @Model.Ucrt</p>
+            <p><strong>Süre (Dakika):</strong> @Model.SrDk</p>
+        </div>
+    </div>
+
+    <form asp-action="HizmetSil" method="post" class="d-flex justify-content-between">
+        <input type="hidden" asp-for="HizmetId" />
+        <button type="submit" class="btn btn-danger rounded-pill px-4">
+            <i class="bi bi-trash"></i> Sil
+        </button>
+        <a asp-action="Hizmetler" class="btn btn-secondary rounded-pill px-4">
+            <i class="bi bi-x-circle"></i> İptal
+        </a>
+    </form>
+</div>

@@ -1,0 +1,18 @@
+﻿@model Berber.Models.Randevu
+
+<h2>Randevu Sil</h2>
+
+<p>Bu randevuyu silmek istediğinize emin misiniz?</p>
+
+<div>
+    <h4>Hizmet: @Model.hizmet?.Ad</h4>
+    <h4>Çalışan: @Model.calisan?.Ad</h4>
+    <h4>Tarih: @Model.RndvTarih.ToShortDateString()</h4>
+</div>
+
+<form asp-action="Delete">
+    @Html.AntiForgeryToken()
+    <input asp-for="RandevuId" type="hidden" />
+    <button type="submit" class="btn btn-danger">Sil</button>
+    <a asp-action="Index" class="btn btn-secondary">İptal</a>
+</form>

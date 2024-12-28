@@ -16,23 +16,44 @@ namespace Berber.Controllers
             _girisYoneticisi = girisYoneticisi;
         }
 
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CikisYap()
+        {
+            await _girisYoneticisi.SignOutAsync();
+            //HttpContext.Session.Clear();
+            //Response.Cookies.Delete("KullaniciAdi");
+            return RedirectToAction("Index", "Home");
+        }
+
+
         [HttpGet]
         public IActionResult KayitOl()
         {
             return View();
         }
-
         [HttpPost]
         public async Task<IActionResult> KayitOl(KayitOlViewModel model)
         {
             if (ModelState.IsValid)
             {
-                var kullanici = new Kullanici { UserName = model.KullaniciAdi, Email = model.Eposta, Ad = model.Ad, Soyad = model.Soyad };
+                var kullanici = new Kullanici
+                {
+                    UserName = model.Eposta,
+                    Email = model.Eposta,
+                    Ad = model.KullaniciAdi,
+
+                };
                 var sonuc = await _kullaniciYoneticisi.CreateAsync(kullanici, model.Parola);
 
                 if (sonuc.Succeeded)
                 {
-                    await _girisYoneticisi.SignInAsync(kullanici, isPersistent: false);
+
+                await _kullaniciYoneticisi.AddToRoleAsync(kullanici, "Kullanici");
+
+
                     return RedirectToAction("Index", "Home");
                 }
 
@@ -56,11 +77,36 @@ namespace Berber.Controllers
         {
             if (ModelState.IsValid)
             {
-                var sonuc = await _girisYoneticisi.PasswordSignInAsync(model.KullaniciAdi, model.Parola, model.BeniHatirla, false);
+                var kullanici = await _kullaniciYoneticisi.FindByNameAsync(model.KullaniciAdi);
+                if (kullanici == null)
+                {
+                    ModelState.AddModelError(string.Empty, "Bu kullanıcı adı mevcut değil.");
+                    return View(model);
+                }
 
+                var sonuc = await _girisYoneticisi.PasswordSignInAsync(model.KullaniciAdi, model.Parola, model.BeniHatirla, false);
                 if (sonuc.Succeeded)
                 {
-                    return RedirectToAction("Index", "Home");
+                    // حفظ بيانات المستخدم في الجلسة
+                    HttpContext.Session.SetString("KullaniciAdi", kullanici.UserName);
+
+                    // تمرير البيانات إلى ViewData
+                    ViewData["KullaniciAdi"] = kullanici.UserName;
+
+                    var roller = await _kullaniciYoneticisi.GetRolesAsync(kullanici);
+
+                    if (roller.Contains("Admin"))
+                    {
+                        return RedirectToAction("Index", "Admin");
+                    }
+                    else if (roller.Contains("Calisan"))
+                    {
+                        return RedirectToAction("Index", "Calisan");
+                    }
+                    else
+                    {
+                        return RedirectToAction("Index", "Home");
+                    }
                 }
 
                 ModelState.AddModelError(string.Empty, "Geçersiz giriş denemesi.");
@@ -69,11 +115,7 @@ namespace Berber.Controllers
             return View(model);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CikisYap()
-        {
-            await _girisYoneticisi.SignOutAsync();
-            return RedirectToAction("Index", "Home");
-        }
+
+       
     }
 }

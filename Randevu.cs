@@ -1,24 +1,28 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Berber.Models
 {
-    public enum OnayDurumu { Bekliyor, Onaylandi, Reddedildi }
+
     public class Randevu
     {
-        public int Id { get; set; }
+        public int RandevuId { get; set; }
 
-       // [Required]
-        public int ClsnId { get; set; } // Çalışan ID
-        public Calisan Clsn { get; set; } // Çalışan
+        public string Onay { get; set; } = "Bekliyor"; 
+        public string MusteriAd { get; set; }
+        public TimeSpan RndvSaat { get; set; } // وقت الموعد
 
-       // [Required]
-        public int HzmtrId { get; set; } // Hizmet ID
-        public Hizmet Hzmtr { get; set; } // Hizmet
+        public DateTime RndvTarih { get; set; }
+        public int CalisanId { get; set; } 
+        public Calisan calisan { get; set; }
 
-       // [Required]
-        public DateTime RndvSt { get; set; } // Randevu Saati
+        public int HizmetId { get; set; } 
+        public Hizmet hizmet { get; set; }
 
-        public OnayDurumu Onay { get; set; } = OnayDurumu.Bekliyor; // Durum: Kullanılıyor mu?
+
+        public string UserID { get; set; }
+        public Kullanici kullanici { get; set; }
+
     }
 }

@@ -26,16 +26,17 @@ namespace Berber.Data
 
             var adminEposta = "b211210577@sakarya.edu.tr";
             var adminSifre = "sau";
+            var AdminAd = "abdullah";
 
-
-            // Kontrol: Admin kullanıcısı zaten var mı?
+        
             if (await kullaniciYoneticisi.FindByEmailAsync(adminEposta) == null)
             {
                 var adminKullanici = new Kullanici
                 {
                     Email = adminEposta,
-                    UserName = adminSifre,
-                     EmailConfirmed = true
+                    UserName = adminEposta,
+                    Ad = AdminAd
+                    
                 };
 
                 var sonuc = await kullaniciYoneticisi.CreateAsync(adminKullanici, adminSifre);

@@ -1,0 +1,31 @@
+﻿@model Calisan
+
+@{
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+   
+}
+
+<div class="container mt-5">
+    <div class="card shadow-sm rounded">
+        <div class="card-header bg-danger text-white text-center">
+            <h2 class="m-0"><i class="bi bi-trash-fill"></i> Çalışan Sil</h2>
+        </div>
+        <div class="card-body text-center">
+            <p class="fs-5 text-muted mb-4">Bu çalışanı silmek istediğinize emin misiniz?</p>
+            <div class="border p-3 rounded bg-light">
+                <h4 class="text-danger"><i class="bi bi-person-fill"></i> @Model.Ad</h4>
+                <p><strong><i class="bi bi-clock-fill"></i> Başlangıç Saati:</strong> @Model.SaatBaslangic</p>
+                <p><strong><i class="bi bi-clock-fill"></i> Bitiş Saati:</strong> @Model.SaatBitis</p>
+            </div>
+            <form asp-action="CalisanSil" method="post" class="mt-4">
+                <input type="hidden" asp-for="CalisanId" />
+                <button type="submit" class="btn btn-danger rounded-pill px-4">
+                    <i class="bi bi-trash"></i> Sil
+                </button>
+                <a asp-action="Calisanlar" class="btn btn-secondary rounded-pill px-4">
+                    <i class="bi bi-arrow-left"></i> İptal
+                </a>
+            </form>
+        </div>
+    </div>
+</div>

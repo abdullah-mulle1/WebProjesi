@@ -1,0 +1,58 @@
+﻿@model List<Calisan>
+
+@{
+    ViewData["Title"] = "Çalışanlar";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+
+}
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Çalışanlar Listesi</h2>
+    <a asp-action="CalisanEkle" class="btn btn-success mb-3">Yeni Çalışan Ekle</a>
+
+    <table class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th>Ad</th>
+                <th>Email</th>
+                <th>Başlama Saati</th>
+                <th>Bitiş Saati</th>
+                <th>Hizmetler</th>
+                <th>İşlemler</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var calisan in Model)
+            {
+                    <tr>
+                        <td>@calisan.Ad</td>
+                        <td>@calisan.UserID</td> <!-- Assuming UserID contains the email -->
+                        <td>@calisan.SaatBaslangic</td>
+                        <td>@calisan.SaatBitis</td>
+                        <td>
+                        @if (calisan.CalisanHizmetler.Any())
+                        {
+                                    <ul>
+                                @foreach (var hizmet in calisan.CalisanHizmetler.Select(ch => ch.hizmet))
+                                {
+                                                <li>@hizmet.Ad</li>
+                                }
+                                    </ul>
+                        }
+                        else
+                        {
+                                    <span>Hiçbir Hizmet Yok</span>
+                        }
+                        </td>
+                        <td>
+                            <a asp-action="CalisanGuncelle" asp-route-id="@calisan.CalisanId" class="btn btn-primary btn-sm">Güncelle</a>
+                            <form asp-action="CalisanSil" asp-route-id="@calisan.CalisanId" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-danger btn-sm">Sil</button>
+                            </form>
+                        </td>
+                    </tr>
+            }
+        </tbody>
+    </table>
+</div>

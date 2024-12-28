@@ -1,0 +1,91 @@
+﻿@model Berber.Models.Randevu
+
+<h2 class="text-center mt-5">Yeni Randevu</h2>
+
+<div class="container mt-4">
+    <form asp-action="Create" method="post" class="p-4 shadow-lg rounded bg-light">
+        @Html.AntiForgeryToken()
+
+        <div class="mb-3">
+            <label asp-for="MusteriAd" class="form-label">Müşteri Adı</label>
+            <input asp-for="MusteriAd" class="form-control" placeholder="Müşteri adını giriniz..." />
+            <span asp-validation-for="MusteriAd" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="CalisanId" class="form-label">Çalışan</label>
+            <select asp-for="CalisanId" class="form-select" asp-items="ViewBag.CalisanId" id="calisanSelect">
+                <option value="">Lütfen bir çalışan seçiniz...</option>
+            </select>
+            <span asp-validation-for="CalisanId" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="RndvTarih" class="form-label">Tarih</label>
+            <input asp-for="RndvTarih" class="form-control" type="date" id="dateSelect" />
+            <span asp-validation-for="RndvTarih" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="HizmetId" class="form-label">Hizmet</label>
+            <select asp-for="HizmetId" class="form-select" id="hizmetSelect">
+                <option value="">Lütfen bir hizmet seçiniz...</option>
+            </select>
+            <span asp-validation-for="HizmetId" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label for="slotSelect" class="form-label">Randevu Saati</label>
+            <select class="form-select" id="slotSelect" name="RndvSaat">
+                <option value="">Lütfen bir saat seçiniz...</option>
+            </select>
+        </div>
+
+        <div class="text-center mt-4">
+            <button type="submit" class="btn btn-success btn-lg">Kaydet</button>
+            <a asp-action="Index" class="btn btn-secondary btn-lg">İptal</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // عند تغيير العامل أو التاريخ
+            $("#calisanSelect, #dateSelect").change(function () {
+                var calisanId = $("#calisanSelect").val();
+                var selectedDate = $("#dateSelect").val();
+
+                if (calisanId && selectedDate) {
+                    // جلب الخدمات الخاصة بالعامل
+                    $.getJSON('/Kullanici/GetHizmetlerByCalisan', { calisanId: calisanId }, function (data) {
+                        var hizmetSelect = $("#hizmetSelect");
+                        hizmetSelect.empty().append('<option value="">Lütfen bir hizmet seçiniz...</option>');
+                        $.each(data, function (i, hizmet) {
+                            hizmetSelect.append('<option value="' + hizmet.hizmetId + '">' + hizmet.ad + '</option>');
+                        });
+                    });
+                }
+            });
+
+            // عند تغيير الخدمة
+            $("#hizmetSelect").change(function () {
+                var calisanId = $("#calisanSelect").val();
+                var hizmetId = $(this).val();
+                var selectedDate = $("#dateSelect").val();
+
+                if (calisanId && hizmetId && selectedDate) {
+                    // جلب المواعيد المتاحة
+                    $.getJSON('/Kullanici/GetAvailableSlots', { calisanId: calisanId, hizmetId: hizmetId, selectedDate: selectedDate }, function (data) {
+                        var slotSelect = $("#slotSelect");
+                        slotSelect.empty().append('<option value="">Lütfen bir saat seçiniz...</option>');
+                        $.each(data, function (i, slot) {
+                            // تقسيم النطاق وأخذ بداية الوقت فقط
+                            var startTime = slot.split(" - ")[0];
+                            slotSelect.append('<option value="' + startTime + '">' + slot + '</option>');
+                        });
+                    });
+                }
+            });
+        });
+    </script>
+}

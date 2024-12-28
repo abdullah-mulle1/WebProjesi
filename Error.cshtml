@@ -1,0 +1,42 @@
+﻿@model List<Randevu>
+
+@{
+    ViewData["Title"] = "Randevularım";
+}
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Randevularım</h2>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-warning text-center">
+            Şu anda size atanmış bir randevu bulunmamaktadır.
+        </div>
+    }
+    else
+    {
+        <table class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th>Müşteri Adı</th>
+                    <th>Hizmet</th>
+                    <th>Tarih</th>
+                    <th>Saat</th>
+                    <th>Durum</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var randevu in Model)
+                {
+                    <tr>
+                        <td>@randevu.MusteriAd</td>
+                        <td>@randevu.hizmet?.Ad</td>
+                        <td>@randevu.RndvTarih.ToShortDateString()</td>
+                        <td>@randevu.RndvSaat</td>
+                        <td>@randevu.Onay</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

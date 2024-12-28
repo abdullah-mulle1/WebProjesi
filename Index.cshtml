@@ -1,0 +1,25 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+    <!-- Welcome Card -->
+    <div class="card shadow-lg rounded text-center p-5" style="width: 100%; max-width: 600px;">
+        <h1 class="card-title fw-bold text-primary"><i class="bi bi-person-circle"></i> Merhaba, Admin!</h1>
+        <p class="card-text mt-3 text-secondary">
+            Hoş geldiniz! Görevlerinizi hızlı ve kolay bir şekilde yönetebilirsiniz.
+        </p>
+        <hr>
+        <div class="d-flex justify-content-center gap-3 mt-4">
+            <a href="@Url.Action("Calisanlar", "Admin")" class="btn btn-outline-primary rounded-pill px-4 py-3" style="flex: 1; text-align: center;">
+                <i class="bi bi-people"></i> Çalışanlar
+            </a>
+            <a href="@Url.Action("Hizmetler", "Admin")" class="btn btn-outline-success rounded-pill px-4 py-3" style="flex: 1; text-align: center;">
+                <i class="bi bi-briefcase"></i> Hizmetler
+            </a>
+            <a href="@Url.Action("GunlukKazanc", "Admin")" class="btn btn-outline-warning rounded-pill px-4 py-3" style="flex: 1; text-align: center;">
+                <i class="bi bi-graph-up-arrow"></i> Günlük Kazançlar
+            </a>
+        </div>
+    </div>
+</div>

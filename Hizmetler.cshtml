@@ -1,0 +1,44 @@
+﻿@model IEnumerable<Berber.Models.Hizmet>
+
+@{
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary"><i class="bi bi-card-list"></i> Hizmetler</h2>
+        <a href="@Url.Action("HizmetEkle", "Admin")" class="btn btn-success rounded-pill px-4 shadow-sm">
+            <i class="bi bi-plus-circle"></i> Yeni Hizmet Ekle
+        </a>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover table-bordered shadow-sm">
+            <thead class="table-primary text-center">
+                <tr>
+                    <th><i class="bi bi-tag-fill"></i> Ad</th>
+                    <th><i class="bi bi-currency-exchange"></i> Ücret</th>
+                    <th><i class="bi bi-clock-fill"></i> Süre (Dakika)</th>
+                    <th><i class="bi bi-gear-fill"></i> İşlemler</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var hizmet in Model)
+                {
+                    <tr class="text-center">
+                        <td class="align-middle">@hizmet.Ad</td>
+                        <td class="align-middle">@hizmet.Ucrt.ToString("C")</td>
+                        <td class="align-middle">@hizmet.SrDk</td>
+                        <td class="align-middle">
+                            <a href="@Url.Action("HizmetGuncelle", "Admin", new { id = hizmet.HizmetId })" class="btn btn-warning rounded-pill btn-sm me-2">
+                                <i class="bi bi-pencil-square"></i> Güncelle
+                            </a>
+                            <a href="@Url.Action("HizmetSil", "Admin", new { id = hizmet.HizmetId })" class="btn btn-danger rounded-pill btn-sm" onclick="return confirm('Hizmeti silmek istediğinize emin misiniz?');">
+                                <i class="bi bi-trash3-fill"></i> Sil
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
